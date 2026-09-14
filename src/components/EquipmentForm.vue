@@ -43,6 +43,7 @@
 
         <!-- =================================================
              EQUIPMENT CODE
+             AUTOMATIC: EQ-001, EQ-002, EQ-003...
         ================================================== -->
 
         <ion-item>
@@ -51,8 +52,8 @@
             v-model="form.code"
             label="Equipment Code"
             label-placement="stacked"
-            placeholder="Example: EQ-001"
-            required
+            placeholder="EQ-001"
+            readonly
           />
 
         </ion-item>
@@ -206,12 +207,20 @@
               In Use
             </ion-select-option>
 
+            <ion-select-option value="Open">
+              Open
+            </ion-select-option>
+
             <ion-select-option value="Maintenance">
               Maintenance
             </ion-select-option>
 
             <ion-select-option value="Missing">
               Missing
+            </ion-select-option>
+
+            <ion-select-option value="Found">
+              Found
             </ion-select-option>
 
           </ion-select>
@@ -332,6 +341,15 @@ import {
 
 
 /* =====================================================
+   GET EQUIPMENT DATA FROM FIREBASE
+===================================================== */
+
+import {
+  getEquipments,
+} from "@/services/equipmentServices";
+
+
+/* =====================================================
    EQUIPMENT TYPE
 ===================================================== */
 
@@ -407,15 +425,15 @@ const emptyForm =
 
     name: "",
 
-    category: "Computer",
+    category: "",
 
     classroom: "",
 
     quantity: 1,
 
-    condition: "Good",
+    condition: "",
 
-    status: "Available",
+    status: "",
 
     dateAcquired: "",
 
@@ -447,6 +465,82 @@ const isEditing =
 
 
 /* =====================================================
+   AUTOMATIC EQUIPMENT CODE
+   EQ-001
+   EQ-002
+   EQ-003
+   EQ-004
+===================================================== */
+
+const generateEquipmentCode =
+  async (): Promise<string> => {
+
+    try {
+
+      const equipments =
+        await getEquipments();
+
+      let highestNumber = 0;
+
+
+      equipments.forEach(
+        (equipment) => {
+
+          const match =
+            equipment.code
+              .trim()
+              .match(
+                /^EQ-(\d+)$/i
+              );
+
+
+          if (match) {
+
+            const number =
+              Number(match[1]);
+
+
+            if (
+              number >
+              highestNumber
+            ) {
+
+              highestNumber =
+                number;
+
+            }
+
+          }
+
+        }
+      );
+
+
+      const nextNumber =
+        highestNumber + 1;
+
+
+      return `EQ-${String(
+        nextNumber
+      ).padStart(3, "0")}`;
+
+
+    } catch (error) {
+
+      console.error(
+        "Failed to generate equipment code:",
+        error
+      );
+
+
+      return "EQ-001";
+
+    }
+
+  };
+
+
+/* =====================================================
    WATCH PROPS
 ===================================================== */
 
@@ -457,7 +551,7 @@ watch(
     props.equipment,
   ],
 
-  () => {
+  async () => {
 
     if (!props.isOpen) {
 
@@ -465,6 +559,10 @@ watch(
 
     }
 
+
+    /* ================================================
+       EDIT EXISTING EQUIPMENT
+    ================================================= */
 
     if (props.equipment) {
 
@@ -476,16 +574,27 @@ watch(
 
     }
 
+
+    /* ================================================
+       ADD NEW EQUIPMENT
+       GENERATE AUTOMATIC CODE
+    ================================================= */
+
     else {
 
       form.value =
         emptyForm();
+
+
+      form.value.code =
+        await generateEquipmentCode();
 
     }
 
   },
 
   {
+
     deep: true,
 
     immediate: true,
@@ -500,19 +609,6 @@ watch(
 ===================================================== */
 
 const submitForm = () => {
-
-  if (
-    !form.value.code.trim()
-  ) {
-
-    alert(
-      "Please enter equipment code."
-    );
-
-    return;
-
-  }
-
 
   if (
     !form.value.name.trim()
@@ -556,6 +652,7 @@ const submitForm = () => {
   emit(
     "save",
     {
+
       ...form.value,
 
       quantity:
@@ -564,6 +661,7 @@ const submitForm = () => {
         ),
 
     }
+
   );
 
 };
