@@ -56,7 +56,7 @@ export type EquipmentData = Omit<
 const equipmentRef =
   databaseRef(
     db,
-    "classroom_equipment"
+    "equipment"
   );
 
 
@@ -120,6 +120,7 @@ export const getEquipments =
     const equipments:
       Equipment[] = [];
 
+
     Object.keys(data).forEach(
       (id) => {
 
@@ -161,6 +162,7 @@ export const getEquipments =
       }
     );
 
+
     return equipments;
 
   };
@@ -176,11 +178,21 @@ export const updateEquipment =
     equipment: EquipmentData
   ): Promise<void> => {
 
+    if (!id) {
+
+      throw new Error(
+        "Equipment ID is missing."
+      );
+
+    }
+
+
     const itemRef =
       databaseRef(
         db,
-        `classroom_equipment/${id}`
+        `equipment/${id}`
       );
+
 
     await update(
       itemRef,
@@ -199,11 +211,21 @@ export const deleteEquipment =
     id: string
   ): Promise<void> => {
 
+    if (!id) {
+
+      throw new Error(
+        "Equipment ID is missing."
+      );
+
+    }
+
+
     const itemRef =
       databaseRef(
         db,
-        `classroom_equipment/${id}`
+        `equipment/${id}`
       );
+
 
     await remove(
       itemRef
