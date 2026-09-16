@@ -90,12 +90,12 @@
             required
           >
 
-            <ion-select-option value="Computer">
-              Computer
+            <ion-select-option value="Computer Laboratory">
+              Computer Laboratory
             </ion-select-option>
 
-            <ion-select-option value="Projector">
-              Projector
+            <ion-select-option value="Visual">
+              Visual
             </ion-select-option>
 
             <ion-select-option value="Furniture">
@@ -110,12 +110,12 @@
               Electrical
             </ion-select-option>
 
-            <ion-select-option value="Laboratory">
-              Laboratory
+            <ion-select-option value="Cleaning Materials">
+              Cleaning Materials
             </ion-select-option>
 
-            <ion-select-option value="Other">
-              Other
+            <ion-select-option value="Others">
+              Others
             </ion-select-option>
 
           </ion-select>
